@@ -156,6 +156,8 @@ private:
     
     uint8_t get_producer_idx( const name owner) ;
     
+    bool is_bp( const capi_name owner);
+    
     //hbalance_table                                   _hbalance;
     maccount_table                                 _maccount;
     producer_table                                  _producer;
