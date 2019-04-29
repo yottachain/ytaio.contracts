@@ -19,12 +19,17 @@ Dependencies:
 
 To build the contracts:
 * First, ensure that you have installed [eosio.cdt 1.5](https://github.com/EOSIO/eosio.cdt/releases/tag/v1.5.0).
-* Then just run the ```build.sh``` in the top directory to build all the contracts and the unit tests for these contracts.
-* You could also run the following command:  ` cmake .  &&  make  `
-* Lastly, you could also use eosio.cdt command to compile each concrete contract such as eosio.system as below :
-  ```
-  " eosio-cpp   src/eosio.system.cpp -o eosio.system.wasm -contract=eosio  -abigen  -I  ./include   ../eosio.token/include " 
-  ```
+
+After installing eosio.cdt, there are __three__ ways to build the contracts :
+
+  1. Just run the ```build.sh``` in the top directory to build all the contracts.
+
+  2. Just run the following command in ytaio.contracts directory :   _` cmake .  &&  make  `_
+
+  3. Could also use eosio.cdt command to compile each concrete contract such as eosio.system as below :
+     ```
+        " eosio-cpp   src/eosio.system.cpp -o eosio.system.wasm -contract=eosio  -abigen  -I  ./include   ../eosio.token/include " 
+     ```
   
 After build:
 * The unit tests executable is placed in the _build/tests_ and is named __unit_test__.
