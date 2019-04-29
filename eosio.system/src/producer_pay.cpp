@@ -1,5 +1,5 @@
 #include <eosio.system/eosio.system.hpp>
-
+#include <eosiolib/print.hpp>
 #include <eosio.token/eosio.token.hpp>
 
 namespace eosiosystem {
@@ -15,6 +15,27 @@ namespace eosiosystem {
    const uint32_t blocks_per_hour       = 2 * 3600;
    const int64_t  useconds_per_day      = 24 * 3600 * int64_t(1000000);
    const int64_t  useconds_per_year     = seconds_per_year*1000000ll;
+   const int64_t block_initial_timestamp = 1551369600ll;  // epoch year 2019.03.01 needtochange  unix timestamp 1551369600s
+   //yta seo total= yta_seo_year[i] * YTA_SEO_BASE
+   const uint32_t YTA_SEO_BASE = 10'0000;
+   const double YTA_PRECISION =10000.0000;
+   const uint32_t yta_seo_year[62] = {
+            1000, 900, 800, 700,
+            600, 600, 500, 500,
+            400, 400, 300, 300,
+            200, 200, 200,
+            100, 100, 100,
+            90, 90, 90,
+            80, 80, 80,
+            70, 70, 70, 70,
+            60, 60, 60, 60,
+            50, 50, 50, 50, 50,
+            40, 40, 40, 40, 40,
+            30, 30, 30, 30, 30,
+            20, 20, 20, 20, 20,
+            10, 10, 10, 10, 10,
+            9, 9, 9, 9, 9
+    };
 
    void system_contract::onblock( ignore<block_header> ) {
       using namespace eosio;
@@ -85,16 +106,32 @@ namespace eosiosystem {
 
       const auto ct = current_time_point();
 
-      eosio_assert( ct - prod.last_claim_time > microseconds(useconds_per_day), "already claimed rewards within past day" );
+      //todo comment while debuging
+      //eosio_assert( ct - prod.last_claim_time > microseconds(useconds_per_day), "already claimed rewards within past day" );
 
       const asset token_supply   = eosio::token::get_supply(token_account, core_symbol().code() );
       const auto usecs_since_last_fill = (ct - _gstate.last_pervote_bucket_fill).count();
+      
+      print("usecs_since_last_fill: ", usecs_since_last_fill, "\n");   
+      print("_gstate.last_pervote_bucket_fill: ", _gstate.last_pervote_bucket_fill.sec_since_epoch(), "\n");
+      print("now(): ", now(), "\n");
+       
+      int idx_year = (int)((now()- block_initial_timestamp) / seconds_per_year);
+      auto seo_token = yta_seo_year[idx_year] * YTA_SEO_BASE;
+       
+      print("idx_year: ", idx_year, "\n");
+      print("yta_seo_year[idx_year]: ", yta_seo_year[idx_year], "\n");
+      print( "token_supply: ", token_supply, "\n");
+      print("seo_token: ", seo_token, "\n");
 
       if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > time_point() ) {
-         auto new_tokens = static_cast<int64_t>( (continuous_rate * double(token_supply.amount) * double(usecs_since_last_fill)) / double(useconds_per_year) );
+         //auto new_tokens = static_cast<int64_t>( (continuous_rate * double(token_supply.amount) * double(usecs_since_last_fill)) / double(useconds_per_year) );
+         auto new_tokens = static_cast<int64_t>(seo_token * YTA_PRECISION * double(usecs_since_last_fill)/double(useconds_per_year));
+         print("new_token: ", new_tokens, "\n");
+         auto to_producers       = new_tokens;
 
-         auto to_producers     = new_tokens / 5;
-         auto to_savings       = new_tokens - to_producers;
+         //auto to_producers     = new_tokens / 5;
+         //auto to_savings       = new_tokens - to_producers;
          auto to_per_block_pay = to_producers / 4;
          auto to_per_vote_pay  = to_producers - to_per_block_pay;
 
@@ -103,10 +140,10 @@ namespace eosiosystem {
             { _self, asset(new_tokens, core_symbol()), std::string("issue tokens for producer pay and savings") }
          );
 
-         INLINE_ACTION_SENDER(eosio::token, transfer)(
+        /*  INLINE_ACTION_SENDER(eosio::token, transfer)(
             token_account, { {_self, active_permission} },
             { _self, saving_account, asset(to_savings, core_symbol()), "unallocated inflation" }
-         );
+         );  */
 
          INLINE_ACTION_SENDER(eosio::token, transfer)(
             token_account, { {_self, active_permission} },
