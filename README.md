@@ -28,5 +28,5 @@ To build the contracts:
   
 After build:
 * The unit tests executable is placed in the _build/tests_ and is named __unit_test__.
-* The contracts are built into a _build/\<contract name\>_ folder in their respective directories.
+* The contracts are built into a __build__/\<contract name\> folder in their respective directories.
 * Finally, simply use __cleos__ to _set contract_ by pointing to the previously mentioned directory.
