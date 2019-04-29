@@ -1,4 +1,4 @@
-# eosio.contracts
+# ytaio.contracts
 
 ## Version : 1.5.2
 
@@ -17,12 +17,21 @@ Dependencies:
 * [eosio v1.4.x](https://github.com/EOSIO/eos/releases/tag/v1.4.6) to [v1.6.x](https://github.com/EOSIO/eos/releases/tag/v1.6.0)
 * [eosio.cdt v1.4.x](https://github.com/EOSIO/eosio.cdt/releases/tag/v1.4.1) to [v1.5.x](https://github.com/EOSIO/eosio.cdt/releases/tag/v1.5.0)
 
-To build the contracts and the unit tests:
-* First, ensure that your __eosio__ is compiled to the core symbol for the EOSIO blockchain that intend to deploy to.
-* Second, make sure that you have ```sudo make install```ed __eosio__.
-* Then just run the ```build.sh``` in the top directory to build all the contracts and the unit tests for these contracts.
+To build the contracts:
+* First, ensure that you have installed [eosio.cdt 1.5](https://github.com/EOSIO/eosio.cdt/releases/tag/v1.5.0).
 
+After installing eosio.cdt, there are __three__ ways to build the contracts :
+
+  1. Just run the ```build.sh``` in the top directory to build all the contracts.
+
+  2. Just run the following command in ytaio.contracts directory :   _` cmake .  &&  make  `_
+
+  3. Could also use eosio.cdt command to compile each concrete contract such as eosio.system as below :
+     ```
+        " eosio-cpp   src/eosio.system.cpp -o eosio.system.wasm -contract=eosio  -abigen  -I  ./include   ../eosio.token/include " 
+     ```
+  
 After build:
 * The unit tests executable is placed in the _build/tests_ and is named __unit_test__.
-* The contracts are built into a _bin/\<contract name\>_ folder in their respective directories.
+* The contracts are built into a __build__/\<contract name\> folder in their respective directories.
 * Finally, simply use __cleos__ to _set contract_ by pointing to the previously mentioned directory.
