@@ -1,5 +1,6 @@
 #include "hdddata.hpp"
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/chain.h>
 #include <eosiolib/crypto.h>
 #include <eosiolib/print.hpp>
 #include <eosiolib/serialize.hpp>
@@ -394,6 +395,17 @@ uint8_t hdddata::get_producer_idx( const name owner) {
     auto prod_itr = _producer.find( owner.value);
     eosio_assert( prod_itr != _producer.end(), "no such producer row" );
     return prod_itr->producer_inx;
+}
+
+bool hdddata::is_bp( const capi_name owner) {
+      capi_name active_producers[21];
+      auto active_prod_size = get_active_producers( active_producers, sizeof(active_producers) );
+      auto count = active_prod_size / sizeof(capi_name);
+      for( size_t i = 0; i < count; ++i ) {
+         if( active_producers[i] == owner )
+            return true;
+      }
+    return false;
 }
 
 asset exchange_state::convert_to_exchange( connector& c, asset in ) {
